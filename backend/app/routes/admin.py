@@ -112,6 +112,9 @@ def get_admin_dashboard(
             "order_number": o.order_number,
             "customer_name": o.customer.name if o.customer else "Unknown",
             "customer_phone": o.phone,
+            "delivery_address": o.delivery_address,
+            "city": o.city,
+            "pincode": o.pincode,
             "total_amount": o.total_amount,
             "order_status": o.order_status,
             "payment_status": o.payment_status,
@@ -433,14 +436,25 @@ def get_customer_details(
 
     recent_orders = db.query(Order).filter(Order.customer_id == c.id).order_by(desc(Order.created_at)).limit(20).all()
 
+    customer_address = c.address
+    customer_city = c.city
+    customer_pincode = c.pincode
+    if not customer_address and recent_orders:
+        for ord in recent_orders:
+            if ord.delivery_address:
+                customer_address = ord.delivery_address
+                customer_city = ord.city or customer_city
+                customer_pincode = ord.pincode or customer_pincode
+                break
+
     return {
         "id": c.id,
         "name": c.name,
         "email": c.email,
         "phone": c.phone,
-        "address": c.address,
-        "city": c.city,
-        "pincode": c.pincode,
+        "address": customer_address,
+        "city": customer_city,
+        "pincode": customer_pincode,
         "is_active": c.is_active,
         "created_at": c.created_at,
         "total_orders": total_orders,
