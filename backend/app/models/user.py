@@ -22,7 +22,7 @@ class User(Base):
     # Relationships
     cook_profile = relationship("HomeCook", back_populates="user", uselist=False, cascade="all, delete-orphan")
     cart = relationship("Cart", back_populates="customer", uselist=False, cascade="all, delete-orphan")
-    orders = relationship("Order", back_populates="customer", foreign_keys="Order.customer_id", cascade="all, delete-orphan")
+    orders = relationship("Order", back_populates="customer", foreign_keys="Order.customer_id")
     reviews = relationship("Review", back_populates="customer", cascade="all, delete-orphan")
     favorites = relationship("Favorite", back_populates="customer", cascade="all, delete-orphan")
     subscriptions = relationship("Subscription", back_populates="customer", cascade="all, delete-orphan")
