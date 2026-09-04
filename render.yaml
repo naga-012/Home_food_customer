@@ -17,8 +17,9 @@ services:
         value: 1440
 
   # Frontend React (Vite) Static Site
-  - type: static
+  - type: web
     name: inti-ruchi-frontend
+    runtime: static
     rootDir: frontend
     plan: free
     buildCommand: npm install && npm run build
