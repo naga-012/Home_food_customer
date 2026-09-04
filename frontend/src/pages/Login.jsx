@@ -29,6 +29,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotMsg, setForgotMsg] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const registrationMsg = location.state?.message || '';
 
   const handleSubmit = async (e) => {
@@ -51,12 +53,47 @@ const Login = () => {
 
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setForgotMsg('');
+
+    if (!newPassword) {
+      // Step 1: Send reset token notification
+      try {
+        setLoading(true);
+        const res = await authService.forgotPassword({ email: email.trim() });
+        setForgotMsg(res.data.message || 'Account verified. Now enter your new password below.');
+      } catch (err) {
+        setError(err.response?.data?.detail || 'Account not found. Please verify your email.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setError('New passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await authService.forgotPassword({ email });
-      setForgotMsg(res.data.message || 'Password reset link sent!');
+      const res = await authService.resetPassword({
+        email: email.trim(),
+        new_password: newPassword,
+        reset_token: 'demo-reset-token',
+      });
+      setForgotMsg(res.data.message || 'Password reset successfully! You can now sign in.');
+      setTimeout(() => {
+        setForgotMode(false);
+        setPassword(newPassword);
+      }, 1500);
     } catch (err) {
-      setError('Failed to request password reset');
+      setError(err.response?.data?.detail || 'Failed to reset password. Please check your email.');
     } finally {
       setLoading(false);
     }
@@ -170,21 +207,47 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="e.g. customer@intiruchi.com"
-                className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-none focus:border-orange-500"
+                className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-none focus:border-orange-500 font-medium"
               />
             </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">New Password</label>
+              <input
+                type="password"
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter at least 6 characters"
+                className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-none focus:border-orange-500 font-medium"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Confirm New Password</label>
+              <input
+                type="password"
+                required
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                placeholder="Re-enter new password"
+                className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-none focus:border-orange-500 font-medium"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-orange-600 text-white font-bold rounded-xl text-xs"
+              className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs shadow-md shadow-orange-600/20 transition-all"
             >
-              Send Reset Link
+              {loading ? 'Resetting Password...' : 'Reset Password ➔'}
             </button>
             <button
               type="button"
               onClick={() => {
                 setForgotMode(false);
                 setForgotMsg('');
+                setError('');
               }}
               className="w-full py-2 text-slate-500 font-semibold text-xs hover:underline"
             >
