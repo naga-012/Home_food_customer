@@ -23,6 +23,8 @@ class CustomerSummaryOut(BaseModel):
     phone: Optional[str] = None
     city: Optional[str] = None
     address: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_active: bool
 
     class Config:
@@ -45,6 +47,8 @@ class AdminOrderOut(BaseModel):
     order_status: str
     rejection_reason: Optional[str] = None
     special_instructions: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     created_at: datetime
     customer: Optional[CustomerSummaryOut] = None
     items: List[OrderItemOut] = []
@@ -74,6 +78,8 @@ class CustomerListItemOut(BaseModel):
     phone: Optional[str] = None
     address: Optional[str] = None
     city: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_active: bool
     created_at: datetime
     total_orders: int
@@ -91,6 +97,8 @@ class CustomerDetailOut(BaseModel):
     address: Optional[str] = None
     city: Optional[str] = None
     pincode: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_active: bool
     created_at: datetime
     total_orders: int

@@ -20,6 +20,8 @@ class OrderCreate(BaseModel):
     payment_method: str = "COD"  # COD, UPI, CARD
     special_instructions: Optional[str] = None
     cook_id: Optional[int] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 class OrderStatusUpdate(BaseModel):
     order_status: str  # PENDING, ACCEPTED, PREPARING, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
@@ -41,6 +43,8 @@ class OrderOut(BaseModel):
     payment_status: str
     order_status: str
     special_instructions: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     created_at: datetime
     items: List[OrderItemOut] = []
 

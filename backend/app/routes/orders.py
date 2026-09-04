@@ -75,6 +75,8 @@ def create_order(
         payment_status=payment_status,
         order_status="PENDING",
         special_instructions=data.special_instructions,
+        latitude=data.latitude,
+        longitude=data.longitude,
     )
     db.add(order)
     db.commit()

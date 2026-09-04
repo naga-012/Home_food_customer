@@ -28,6 +28,21 @@ from app.seed_data import auto_seed_if_empty
 async def lifespan(app: FastAPI):
     # Ensure tables exist and database has seed data on deployment
     Base.metadata.create_all(bind=engine)
+    
+    # Auto-migrate database tables for high-precision GPS coordinates
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            for table in ["orders", "users"]:
+                for col in ["latitude", "longitude"]:
+                    try:
+                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} FLOAT;"))
+                        conn.commit()
+                    except Exception:
+                        pass
+    except Exception as e:
+        print("Migration notice:", e)
+
     auto_seed_if_empty()
     yield
 

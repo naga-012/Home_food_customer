@@ -16,6 +16,8 @@ class Order(Base):
     delivery_address = Column(String(255), nullable=False)
     city = Column(String(100), nullable=True)
     pincode = Column(String(20), nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     phone = Column(String(20), nullable=False)
     payment_method = Column(String(20), default="COD", nullable=False)  # COD, UPI, CARD
     payment_status = Column(String(20), default="PENDING", nullable=False)  # PENDING, PAID, FAILED

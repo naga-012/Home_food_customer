@@ -49,6 +49,8 @@ const Checkout = () => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('Hyderabad');
   const [pincode, setPincode] = useState('500081');
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
   const [phone, setPhone] = useState('');
   const [instructions, setInstructions] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('UPI'); // COD, UPI, CARD
@@ -111,13 +113,19 @@ const Checkout = () => {
       setSubmitting(true);
       setOrderError('');
 
+      const fullDeliveryAddress = (lat && lng && !address.includes('[GPS:'))
+        ? `${address || 'Hyderabad'} [GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}]`
+        : (address || 'Hyderabad');
+
       const orderData = {
-        delivery_address: address || 'Hyderabad',
+        delivery_address: fullDeliveryAddress,
         city: city || 'Hyderabad',
         pincode: pincode || '500081',
         phone: phone || user?.phone || '9876543210',
         payment_method: paymentMethod,
         special_instructions: instructions,
+        latitude: lat || null,
+        longitude: lng || null,
       };
 
       const res = await orderService.createOrder(orderData);
@@ -480,10 +488,14 @@ const Checkout = () => {
               address={address}
               city={city}
               pincode={pincode}
-              onLocationSelect={({ address: newAddr, city: newCity, pincode: newPin }) => {
+              onLocationSelect={({ address: newAddr, city: newCity, pincode: newPin, lat: newLat, lng: newLng }) => {
                 if (newAddr) setAddress(newAddr);
                 if (newCity) setCity(newCity);
                 if (newPin) setPincode(newPin);
+                if (newLat && newLng) {
+                  setLat(newLat);
+                  setLng(newLng);
+                }
               }}
             />
 
