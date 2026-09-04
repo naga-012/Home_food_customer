@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
+import ScrollToTop from './components/common/ScrollToTop';
 
 // Public storefront pages
 import Home from './pages/Home';
@@ -18,7 +19,9 @@ import Profile from './pages/customer/Profile';
 
 function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* Customer Storefront Layout (Swiggy style unified layout) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
@@ -42,6 +45,7 @@ function App() {
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 
