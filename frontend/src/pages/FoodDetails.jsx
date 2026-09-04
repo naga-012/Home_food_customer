@@ -23,7 +23,7 @@ import {
 const FoodDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, cart, updateQuantity, removeFromCart } = useCart();
   const { isAuthenticated } = useAuth();
 
   const [food, setFood] = useState(null);
@@ -82,6 +82,7 @@ const FoodDetails = () => {
 
   const effectivePrice = food.is_evening_offer && food.discount_price ? food.discount_price : food.price;
   const isSoldOut = !food.is_available || food.quantity <= 0;
+  const cartItem = cart?.items?.find((item) => item.food_id === food.id);
 
   const handleAddToCart = () => {
     if (isSoldOut) return;
@@ -261,50 +262,126 @@ const FoodDetails = () => {
           </div>
 
           {/* Action Box: Quantity & Buttons */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-4 pt-2">
             {!isSoldOut ? (
-              <>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-slate-200 rounded-2xl bg-white p-1 shadow-sm">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      aria-label="Decrease quantity"
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
-                    >
-                      <Minus size={15} />
-                    </button>
-                    <span className="w-12 text-center text-sm font-bold text-slate-800">
-                      {quantity}
+              cartItem && cartItem.quantity > 0 ? (
+                <div className="p-4 bg-orange-50/70 border border-orange-200 rounded-3xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-orange-950 flex items-center gap-1.5">
+                        <ShoppingBag size={15} className="text-orange-600" />
+                        Added to your cart!
+                      </span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Adjust quantity below or proceed to checkout
+                      </p>
+                    </div>
+                    <span className="text-sm font-extrabold text-slate-900">
+                      ₹{(effectivePrice * cartItem.quantity).toFixed(0)}
                     </span>
-                    <button
-                      onClick={() => setQuantity(Math.min(food.quantity, quantity + 1))}
-                      aria-label="Increase quantity"
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
-                    >
-                      <Plus size={15} />
-                    </button>
                   </div>
 
-                  <span className="text-xs text-slate-500">
-                    Subtotal: <strong className="text-slate-900 text-sm">₹{(effectivePrice * quantity).toFixed(0)}</strong>
-                  </span>
-                </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center bg-white border border-orange-300 rounded-2xl p-1 shadow-sm">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (cartItem.quantity <= 1) {
+                            removeFromCart(cartItem.id);
+                          } else {
+                            updateQuantity(cartItem.id, cartItem.quantity - 1);
+                          }
+                        }}
+                        aria-label="Decrease quantity in cart"
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-orange-600 hover:bg-orange-100 active:bg-orange-200 transition-colors cursor-pointer"
+                      >
+                        <Minus size={16} strokeWidth={2.5} />
+                      </button>
+                      <span className="w-12 text-center text-base font-black text-slate-900 select-none">
+                        {cartItem.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (food.quantity && cartItem.quantity >= food.quantity) return;
+                          updateQuantity(cartItem.id, cartItem.quantity + 1);
+                        }}
+                        disabled={food.quantity && cartItem.quantity >= food.quantity}
+                        aria-label="Increase quantity in cart"
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-orange-600 transition-colors ${
+                          food.quantity && cartItem.quantity >= food.quantity
+                            ? 'opacity-30 cursor-not-allowed'
+                            : 'hover:bg-orange-100 active:bg-orange-200 cursor-pointer'
+                        }`}
+                      >
+                        <Plus size={16} strokeWidth={2.5} />
+                      </button>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <button
-                    onClick={handleAddToCart}
-                    className="py-3 px-4 rounded-2xl bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
-                  >
-                    <ShoppingBag size={16} /> Add to Cart
-                  </button>
-                  <button
-                    onClick={handleBuyNow}
-                    className="py-3 px-4 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all"
-                  >
-                    Buy Now ➔
-                  </button>
+                    <span className="text-xs text-slate-500 font-medium">
+                      ({cartItem.quantity} {cartItem.quantity === 1 ? 'item' : 'items'} in cart)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <button
+                      onClick={() => navigate('/cart')}
+                      className="py-3 px-4 rounded-2xl bg-white hover:bg-orange-100 text-orange-700 border border-orange-300 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                    >
+                      <ShoppingBag size={16} /> View Cart
+                    </button>
+                    <button
+                      onClick={() => navigate('/checkout')}
+                      className="py-3 px-4 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all"
+                    >
+                      Proceed to Checkout ➔
+                    </button>
+                  </div>
                 </div>
-              </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border border-slate-200 rounded-2xl bg-white p-1 shadow-sm">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        aria-label="Decrease quantity"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
+                      >
+                        <Minus size={15} />
+                      </button>
+                      <span className="w-12 text-center text-sm font-bold text-slate-800">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity(Math.min(food.quantity, quantity + 1))}
+                        aria-label="Increase quantity"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
+                      >
+                        <Plus size={15} />
+                      </button>
+                    </div>
+
+                    <span className="text-xs text-slate-500">
+                      Subtotal: <strong className="text-slate-900 text-sm">₹{(effectivePrice * quantity).toFixed(0)}</strong>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <button
+                      onClick={handleAddToCart}
+                      className="py-3 px-4 rounded-2xl bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+                    >
+                      <ShoppingBag size={16} /> Add to Cart
+                    </button>
+                    <button
+                      onClick={handleBuyNow}
+                      className="py-3 px-4 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all"
+                    >
+                      Buy Now ➔
+                    </button>
+                  </div>
+                </>
+              )
             ) : (
               <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-center font-bold text-sm">
                 This item is currently sold out for today. Please check back tomorrow!

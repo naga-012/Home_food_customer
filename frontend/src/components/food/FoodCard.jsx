@@ -4,10 +4,10 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { favoriteService } from '../../services/api';
 import VegBadge from '../common/VegBadge';
-import { Star, Clock, ChefHat, Heart, ShoppingBag, Flame, Plus, Check } from 'lucide-react';
+import { Star, Clock, ChefHat, Heart, ShoppingBag, Flame, Plus, Minus, Check } from 'lucide-react';
 
 const FoodCard = ({ food, isFavorited = false, onFavoriteToggle }) => {
-  const { addToCart, cart } = useCart();
+  const { addToCart, cart, updateQuantity, removeFromCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -27,6 +27,25 @@ const FoodCard = ({ food, isFavorited = false, onFavoriteToggle }) => {
     addToCart(food, 1);
     setAddedAnimation(true);
     setTimeout(() => setAddedAnimation(false), 1200);
+  };
+
+  const handleIncrease = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!cartItem) return;
+    if (food.quantity && cartItem.quantity >= food.quantity) return;
+    updateQuantity(cartItem.id, cartItem.quantity + 1);
+  };
+
+  const handleDecrease = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!cartItem) return;
+    if (cartItem.quantity <= 1) {
+      removeFromCart(cartItem.id);
+    } else {
+      updateQuantity(cartItem.id, cartItem.quantity - 1);
+    }
   };
 
   const handleFavoriteClick = async (e) => {
@@ -173,7 +192,7 @@ const FoodCard = ({ food, isFavorited = false, onFavoriteToggle }) => {
             )}
           </div>
 
-          {/* Add To Cart Button */}
+          {/* Add / Quantity Controls */}
           {isSoldOut ? (
             <button
               disabled
@@ -181,24 +200,51 @@ const FoodCard = ({ food, isFavorited = false, onFavoriteToggle }) => {
             >
               Unavailable
             </button>
+          ) : cartItem && cartItem.quantity > 0 ? (
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="flex items-center bg-orange-600 text-white rounded-xl shadow-sm overflow-hidden border border-orange-600"
+            >
+              <button
+                type="button"
+                onClick={handleDecrease}
+                aria-label={`Decrease quantity of ${food.name}`}
+                className="w-8 h-8 flex items-center justify-center text-white hover:bg-orange-700 active:bg-orange-800 transition-colors cursor-pointer"
+              >
+                <Minus size={13} strokeWidth={2.5} />
+              </button>
+              <span className="min-w-[1.75rem] px-1 text-center text-xs font-black tracking-tight select-none">
+                {cartItem.quantity}
+              </span>
+              <button
+                type="button"
+                onClick={handleIncrease}
+                disabled={food.quantity && cartItem.quantity >= food.quantity}
+                aria-label={`Increase quantity of ${food.name}`}
+                className={`w-8 h-8 flex items-center justify-center text-white transition-colors ${
+                  food.quantity && cartItem.quantity >= food.quantity
+                    ? 'opacity-40 cursor-not-allowed'
+                    : 'hover:bg-orange-700 active:bg-orange-800 cursor-pointer'
+                }`}
+              >
+                <Plus size={13} strokeWidth={2.5} />
+              </button>
+            </div>
           ) : (
             <button
               onClick={handleAddToCart}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
                 addedAnimation
                   ? 'bg-emerald-600 text-white scale-105'
-                  : cartItem
-                  ? 'bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100'
-                  : 'bg-orange-600 text-white hover:bg-orange-700 hover:shadow-md'
+                  : 'bg-orange-600 text-white hover:bg-orange-700 hover:shadow-md active:scale-95'
               }`}
             >
               {addedAnimation ? (
                 <>
                   <Check size={14} /> Added!
-                </>
-              ) : cartItem ? (
-                <>
-                  <ShoppingBag size={13} /> {cartItem.quantity} in cart
                 </>
               ) : (
                 <>
