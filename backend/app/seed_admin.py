@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import sqlite3
 
@@ -9,6 +9,21 @@ from app.models.user import User
 from app.models.audit_log import AdminAuditLog
 from app.models.order import Order
 from app.utils.security import hash_password
+
+ADMIN_ACCOUNTS = [
+    {
+        "name": "Nagarjun Admin",
+        "email": "myakalanagarjun09@gmail.com",
+        "password": "naga@012",
+        "phone": "9800000001",
+    },
+    {
+        "name": "Inti Ruchi Admin",
+        "email": "admin@intiruchi.com",
+        "password": "admin123",
+        "phone": "9800000000",
+    }
+]
 
 def seed_admin():
     print("Ensuring database tables exist...")
@@ -31,43 +46,44 @@ def seed_admin():
         except Exception as e:
             print(f"Migration check notice: {e}")
 
-    admin_email = os.getenv("ADMIN_EMAIL", "admin@intiruchi.com")
-    admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
-
     db = SessionLocal()
     try:
-        admin_user = db.query(User).filter(User.email == admin_email).first()
-        if not admin_user:
-            print(f"Creating development Admin account ({admin_email})...")
-            admin_user = User(
-                name="Inti Ruchi Admin",
-                email=admin_email,
-                phone="9800000000",
-                password_hash=hash_password(admin_password),
-                role="ADMIN",
-                address="Admin Headquarters, Hitec City",
-                city="Hyderabad",
-                pincode="500081",
-                is_active=True,
-            )
-            db.add(admin_user)
-            db.commit()
-            db.refresh(admin_user)
-            print("Admin account created successfully!")
-        else:
-            print(f"Admin account ({admin_email}) exists, ensuring role=ADMIN and active...")
-            admin_user.role = "ADMIN"
-            admin_user.password_hash = hash_password(admin_password)
-            admin_user.is_active = True
-            db.commit()
-            print("Admin account verified.")
+        primary_admin = None
+        for acc in ADMIN_ACCOUNTS:
+            admin_user = db.query(User).filter(User.email == acc["email"]).first()
+            if not admin_user:
+                print(f"Creating Admin account ({acc['email']})...")
+                admin_user = User(
+                    name=acc["name"],
+                    email=acc["email"],
+                    phone=acc["phone"],
+                    password_hash=hash_password(acc["password"]),
+                    role="ADMIN",
+                    address="Admin Headquarters, Hitec City",
+                    city="Hyderabad",
+                    pincode="500081",
+                    is_active=True,
+                )
+                db.add(admin_user)
+                db.commit()
+                db.refresh(admin_user)
+                print(f"Admin account ({acc['email']}) created successfully!")
+            else:
+                admin_user.role = "ADMIN"
+                admin_user.password_hash = hash_password(acc["password"])
+                admin_user.is_active = True
+                db.commit()
+                print(f"Admin account ({acc['email']}) verified and password synchronized.")
+            
+            if not primary_admin:
+                primary_admin = admin_user
 
         # Ensure at least one initial audit log entry
         log_count = db.query(AdminAuditLog).count()
-        if log_count == 0:
+        if log_count == 0 and primary_admin:
             initial_log = AdminAuditLog(
-                admin_id=admin_user.id,
-                admin_email=admin_user.email,
+                admin_id=primary_admin.id,
+                admin_email=primary_admin.email,
                 action="SYSTEM_INIT",
                 details="Admin system initialized with unified single database",
             )
