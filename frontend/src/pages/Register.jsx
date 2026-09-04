@@ -50,7 +50,14 @@ const Register = () => {
       // Automatic login removed - explicitly ask customer to log in
       setRegisteredSuccess(true);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      const detail = err.response?.data?.detail;
+      if (typeof detail === 'string') {
+        setError(detail);
+      } else if (Array.isArray(detail) && detail.length > 0) {
+        setError(detail.map((d) => d.msg || d.message || JSON.stringify(d)).join(' • '));
+      } else {
+        setError(err.message || 'Registration failed. Please check your connection.');
+      }
     } finally {
       setLoading(false);
     }
@@ -121,8 +128,13 @@ const Register = () => {
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold">
-            {error}
+          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold flex flex-col gap-1">
+            <span>{error}</span>
+            {error.toLowerCase().includes('already exists') && (
+              <Link to="/login" className="text-orange-700 underline font-bold mt-1 inline-block">
+                ➔ Click here to Sign In with this email
+              </Link>
+            )}
           </div>
         )}
 
