@@ -23,3 +23,5 @@ __all__ = [
     "Subscription",
     "Notification",
 ]
+
+from app.models.audit_log import AdminAuditLog

@@ -19,7 +19,8 @@ class Order(Base):
     phone = Column(String(20), nullable=False)
     payment_method = Column(String(20), default="COD", nullable=False)  # COD, UPI, CARD
     payment_status = Column(String(20), default="PENDING", nullable=False)  # PENDING, PAID, FAILED
-    order_status = Column(String(30), default="PENDING", nullable=False)  # PENDING, ACCEPTED, PREPARING, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
+    order_status = Column(String(30), default="PENDING", nullable=False)  # PENDING, ACCEPTED, PREPARING, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, REJECTED
+    rejection_reason = Column(String(255), nullable=True)
     special_instructions = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

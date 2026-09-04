@@ -60,3 +60,5 @@ def require_role(allowed_roles: List[str]):
 
 require_cook = require_role(["HOME_COOK"])
 require_customer = require_role(["CUSTOMER"])
+
+require_admin = require_role(["ADMIN", "admin"])

@@ -18,6 +18,7 @@ from app.routes import (
     reviews_router,
     favorites_router,
     notifications_router,
+    admin_router,
 )
 
 # Create database tables automatically
@@ -53,6 +54,7 @@ app.include_router(subscriptions_router)
 app.include_router(reviews_router)
 app.include_router(favorites_router)
 app.include_router(notifications_router)
+app.include_router(admin_router)
 
 @app.get("/")
 def root():
