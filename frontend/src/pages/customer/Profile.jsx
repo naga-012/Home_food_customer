@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/api';
 import { User, Lock, CheckCircle2, Loader2 } from 'lucide-react';
+import GoogleLocationPicker from '../../components/common/GoogleLocationPicker';
 
 const Profile = () => {
   const { user, updateCurrentUser } = useAuth();
@@ -106,6 +107,21 @@ const Profile = () => {
               />
             </div>
           </div>
+
+          {/* Google Location & GPS Detection */}
+          <GoogleLocationPicker
+            address={profileData.address}
+            city={profileData.city}
+            pincode={profileData.pincode}
+            onLocationSelect={({ address: newAddr, city: newCity, pincode: newPin }) => {
+              setProfileData((prev) => ({
+                ...prev,
+                address: newAddr || prev.address,
+                city: newCity || prev.city,
+                pincode: newPin || prev.pincode,
+              }));
+            }}
+          />
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">Default Delivery Address</label>

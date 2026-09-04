@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderService, authService } from '../services/api';
 import VegBadge from '../components/common/VegBadge';
+import GoogleLocationPicker from '../components/common/GoogleLocationPicker';
 import {
   MapPin,
   Phone,
@@ -474,7 +475,19 @@ const Checkout = () => {
               </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Google Location & GPS Detection */}
+            <GoogleLocationPicker
+              address={address}
+              city={city}
+              pincode={pincode}
+              onLocationSelect={({ address: newAddr, city: newCity, pincode: newPin }) => {
+                if (newAddr) setAddress(newAddr);
+                if (newCity) setCity(newCity);
+                if (newPin) setPincode(newPin);
+              }}
+            />
+
+            <div className="space-y-3 pt-2">
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Street Address & Flat Number
