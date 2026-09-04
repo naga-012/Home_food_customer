@@ -39,7 +39,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: inti-ruchi-backend
-          property: host
+        value: https://inti-ruchi-backend.onrender.com

@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim();
+const rawApiUrl = (import.meta.env.VITE_API_URL || 'https://inti-ruchi-backend.onrender.com').trim();
 let trimmedApiUrl = rawApiUrl.replace(/\/+$/, '');
+if (trimmedApiUrl && !trimmedApiUrl.includes('.') && !trimmedApiUrl.includes('localhost')) {
+  trimmedApiUrl = `${trimmedApiUrl}.onrender.com`;
+}
 if (trimmedApiUrl && !trimmedApiUrl.startsWith('http://') && !trimmedApiUrl.startsWith('https://')) {
   trimmedApiUrl = `https://${trimmedApiUrl}`;
 }
