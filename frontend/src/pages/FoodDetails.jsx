@@ -282,7 +282,7 @@ const FoodDetails = () => {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-white border border-orange-300 rounded-2xl p-1 shadow-sm">
+                    <div className="inline-flex items-center justify-between bg-[#f4f7fb] hover:bg-[#ebf1f8] border border-[#d6e0ea] rounded-full px-3 py-1.5 shadow-sm">
                       <button
                         type="button"
                         onClick={() => {
@@ -293,11 +293,11 @@ const FoodDetails = () => {
                           }
                         }}
                         aria-label="Decrease quantity in cart"
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-orange-600 hover:bg-orange-100 active:bg-orange-200 transition-colors cursor-pointer"
+                        className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-slate-950 active:scale-90 transition-all cursor-pointer"
                       >
-                        <Minus size={16} strokeWidth={2.5} />
+                        <Minus size={15} strokeWidth={2} />
                       </button>
-                      <span className="w-12 text-center text-base font-black text-slate-900 select-none">
+                      <span className="w-10 text-center text-sm font-extrabold text-slate-800 select-none">
                         {cartItem.quantity}
                       </span>
                       <button
@@ -308,13 +308,13 @@ const FoodDetails = () => {
                         }}
                         disabled={food.quantity && cartItem.quantity >= food.quantity}
                         aria-label="Increase quantity in cart"
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-orange-600 transition-colors ${
+                        className={`w-8 h-8 flex items-center justify-center text-slate-600 transition-all ${
                           food.quantity && cartItem.quantity >= food.quantity
                             ? 'opacity-30 cursor-not-allowed'
-                            : 'hover:bg-orange-100 active:bg-orange-200 cursor-pointer'
+                            : 'hover:text-slate-950 active:scale-90 cursor-pointer'
                         }`}
                       >
-                        <Plus size={16} strokeWidth={2.5} />
+                        <Plus size={15} strokeWidth={2} />
                       </button>
                     </div>
 
@@ -341,23 +341,23 @@ const FoodDetails = () => {
               ) : (
                 <>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center border border-slate-200 rounded-2xl bg-white p-1 shadow-sm">
+                    <div className="inline-flex items-center justify-between bg-[#f4f7fb] hover:bg-[#ebf1f8] border border-[#d6e0ea] rounded-full px-3 py-1.5 shadow-sm">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                         aria-label="Decrease quantity"
-                        className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-slate-950 active:scale-90 transition-all"
                       >
-                        <Minus size={15} />
+                        <Minus size={15} strokeWidth={2} />
                       </button>
-                      <span className="w-12 text-center text-sm font-bold text-slate-800">
+                      <span className="w-10 text-center text-sm font-extrabold text-slate-800">
                         {quantity}
                       </span>
                       <button
                         onClick={() => setQuantity(Math.min(food.quantity, quantity + 1))}
                         aria-label="Increase quantity"
-                        className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-slate-950 active:scale-90 transition-all"
                       >
-                        <Plus size={15} />
+                        <Plus size={15} strokeWidth={2} />
                       </button>
                     </div>
 

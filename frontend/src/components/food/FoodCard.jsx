@@ -206,17 +206,17 @@ const FoodCard = ({ food, isFavorited = false, onFavoriteToggle }) => {
                 e.preventDefault();
                 e.stopPropagation();
               }}
-              className="flex items-center bg-orange-600 text-white rounded-xl shadow-sm overflow-hidden border border-orange-600"
+              className="inline-flex items-center justify-between bg-[#f4f7fb] hover:bg-[#ebf1f8] border border-[#d6e0ea] rounded-full px-2.5 py-1 shadow-sm transition-all h-8 min-w-[86px]"
             >
               <button
                 type="button"
                 onClick={handleDecrease}
                 aria-label={`Decrease quantity of ${food.name}`}
-                className="w-8 h-8 flex items-center justify-center text-white hover:bg-orange-700 active:bg-orange-800 transition-colors cursor-pointer"
+                className="w-6 h-6 flex items-center justify-center text-slate-600 hover:text-slate-950 active:scale-90 transition-all cursor-pointer"
               >
-                <Minus size={13} strokeWidth={2.5} />
+                <Minus size={14} strokeWidth={2} />
               </button>
-              <span className="min-w-[1.75rem] px-1 text-center text-xs font-black tracking-tight select-none">
+              <span className="px-1 text-center text-xs font-extrabold text-slate-800 select-none">
                 {cartItem.quantity}
               </span>
               <button
@@ -224,19 +224,19 @@ const FoodCard = ({ food, isFavorited = false, onFavoriteToggle }) => {
                 onClick={handleIncrease}
                 disabled={food.quantity && cartItem.quantity >= food.quantity}
                 aria-label={`Increase quantity of ${food.name}`}
-                className={`w-8 h-8 flex items-center justify-center text-white transition-colors ${
+                className={`w-6 h-6 flex items-center justify-center text-slate-600 transition-all ${
                   food.quantity && cartItem.quantity >= food.quantity
-                    ? 'opacity-40 cursor-not-allowed'
-                    : 'hover:bg-orange-700 active:bg-orange-800 cursor-pointer'
+                    ? 'opacity-30 cursor-not-allowed'
+                    : 'hover:text-slate-950 active:scale-90 cursor-pointer'
                 }`}
               >
-                <Plus size={13} strokeWidth={2.5} />
+                <Plus size={14} strokeWidth={2} />
               </button>
             </div>
           ) : (
             <button
               onClick={handleAddToCart}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
                 addedAnimation
                   ? 'bg-emerald-600 text-white scale-105'
                   : 'bg-orange-600 text-white hover:bg-orange-700 hover:shadow-md active:scale-95'
