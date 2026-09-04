@@ -16,12 +16,7 @@ from app.models.subscription import Subscription
 from app.models.notification import Notification
 from app.utils.security import hash_password
 
-def seed_database():
-    print("Initializing database tables...")
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    db = SessionLocal()
+def populate_seed_data(db):
     try:
         print("Seeding Home Cooks...")
         cooks_data = [
@@ -814,7 +809,41 @@ def seed_database():
 
         db.commit()
         print("Database successfully seeded with complete authentic data!")
+    except Exception as e:
+        db.rollback()
+        print(f"Error seeding database: {e}")
+        raise e
 
+def seed_database():
+    print("Initializing database tables...")
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        populate_seed_data(db)
+    finally:
+        db.close()
+
+def auto_seed_if_empty():
+    """Ensure database has tables and initial seed data upon cloud deployment."""
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        from app.models.food import Food
+        count = db.query(Food).count()
+        if count == 0:
+            print("Database has 0 foods. Seeding initial home cooks and delicacies...")
+            populate_seed_data(db)
+        
+        # Ensure admin account exists
+        try:
+            from app.seed_admin import seed_admin
+            seed_admin()
+        except Exception as err:
+            print(f"Admin verify notice: {err}")
+    except Exception as err:
+        print(f"Auto-seed check encountered: {err}")
+        db.rollback()
     finally:
         db.close()
 

@@ -14,17 +14,22 @@ def seed_admin():
     print("Ensuring database tables exist...")
     Base.metadata.create_all(bind=engine)
 
-    # Check and add rejection_reason column if not exists
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "intiruchi.db")
-    con = sqlite3.connect(db_path)
-    cur = con.cursor()
-    cur.execute("PRAGMA table_info(orders)")
-    cols = [col[1] for col in cur.fetchall()]
-    if "rejection_reason" not in cols:
-        print("Adding rejection_reason column to orders table...")
-        cur.execute("ALTER TABLE orders ADD COLUMN rejection_reason VARCHAR(255)")
-        con.commit()
-    con.close()
+    if engine.dialect.name == "sqlite":
+        try:
+            from app.config import settings
+            db_path = os.path.join(settings.BACKEND_DIR, "intiruchi.db")
+            if os.path.exists(db_path):
+                con = sqlite3.connect(db_path)
+                cur = con.cursor()
+                cur.execute("PRAGMA table_info(orders)")
+                cols = [col[1] for col in cur.fetchall()]
+                if cols and "rejection_reason" not in cols:
+                    print("Adding rejection_reason column to orders table...")
+                    cur.execute("ALTER TABLE orders ADD COLUMN rejection_reason VARCHAR(255)")
+                    con.commit()
+                con.close()
+        except Exception as e:
+            print(f"Migration check notice: {e}")
 
     admin_email = os.getenv("ADMIN_EMAIL", "admin@intiruchi.com")
     admin_password = os.getenv("ADMIN_PASSWORD", "admin123")

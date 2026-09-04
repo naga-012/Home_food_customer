@@ -19,11 +19,15 @@ class Settings(BaseSettings):
 
     @property
     def RESOLVED_DATABASE_URL(self) -> str:
-        if self.DATABASE_URL.startswith("sqlite:///./"):
-            db_name = self.DATABASE_URL.replace("sqlite:///./", "")
+        url = self.DATABASE_URL
+        # Render provides PostgreSQL URLs starting with postgres://, which SQLAlchemy 1.4+ deprecated
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        elif url.startswith("sqlite:///./"):
+            db_name = url.replace("sqlite:///./", "")
             full_path = os.path.join(self.BACKEND_DIR, db_name).replace("\\", "/")
             return f"sqlite:///{full_path}"
-        return self.DATABASE_URL
+        return url
 
     class Config:
         env_file = ".env"

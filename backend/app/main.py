@@ -21,19 +21,27 @@ from app.routes import (
     admin_router,
 )
 
-# Create database tables automatically
-Base.metadata.create_all(bind=engine)
+from contextlib import asynccontextmanager
+from app.seed_data import auto_seed_if_empty
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure tables exist and database has seed data on deployment
+    Base.metadata.create_all(bind=engine)
+    auto_seed_if_empty()
+    yield
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Inti Ruchi – Production-style Homemade Food Delivery Platform API",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
-# CORS configuration
+# CORS configuration: allow any origin (e.g. Render frontends, localhost, mobile)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permits local dev frontends from Vite, mobile, etc.
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,6 +73,10 @@ def root():
         "docs_url": "/docs",
         "description": "Connecting food lovers with passionate local home chefs!",
     }
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "Inti Ruchi API"}
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
