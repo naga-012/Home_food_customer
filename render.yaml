@@ -2,7 +2,7 @@ services:
   # Backend FastAPI Web Service
   - type: web
     name: inti-ruchi-backend
-    runtime: python
+    env: python
     rootDir: backend
     plan: free
     buildCommand: pip install -r requirements.txt
@@ -19,9 +19,8 @@ services:
   # Frontend React (Vite) Static Site
   - type: web
     name: inti-ruchi-frontend
-    runtime: static
+    env: static
     rootDir: frontend
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     routes:
